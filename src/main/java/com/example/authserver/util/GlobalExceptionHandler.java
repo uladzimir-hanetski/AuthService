@@ -1,6 +1,7 @@
 package com.example.authserver.util;
 
 import com.example.authserver.exception.ErrorResponse;
+import com.example.authserver.exception.InvalidSecurityParametersException;
 import com.example.authserver.exception.LoginAlreadyExistsException;
 import com.example.authserver.exception.UserNotFoundException;
 import io.jsonwebtoken.JwtException;
@@ -46,6 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingHeader() {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "Header's conflict",
                 "Missing Authorization header");
+
+        return new ResponseEntity<>(errorResponse, errorResponse.getStatus());
+    }
+
+    @ExceptionHandler(InvalidSecurityParametersException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSecurity(InvalidSecurityParametersException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Server error", ex.getMessage());
 
         return new ResponseEntity<>(errorResponse, errorResponse.getStatus());
     }

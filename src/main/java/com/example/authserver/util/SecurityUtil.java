@@ -1,5 +1,6 @@
 package com.example.authserver.util;
 
+import com.example.authserver.exception.InvalidSecurityParametersException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -21,12 +22,13 @@ import java.util.UUID;
 public class SecurityUtil {
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String USER_ID = "userId";
 
     @Value("${ACCESS_EXPIRATION}")
-    private int ACCESS_TOKEN_EXPIRE;
+    private int accessTokenExpiration;
 
     @Value("${REFRESH_EXPIRATION}")
-    private int REFRESH_TOKEN_EXPIRE;
+    private int refreshTokenExpiration;
 
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
@@ -39,16 +41,16 @@ public class SecurityUtil {
             publicKey = KeyFactory.getInstance("RSA").generatePublic(
                     new X509EncodedKeySpec(Base64.getDecoder().decode(pbKey)));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new InvalidSecurityParametersException(e.getMessage());
         }
     }
 
     public String getAccessToken(UUID userId) {
         return Jwts.builder()
                 .subject(ACCESS_TOKEN)
-                .claim("userId", userId.toString())
+                .claim(USER_ID, userId.toString())
                 .issuedAt(new Date())
-                .expiration(Date.from(Instant.now().plusSeconds(ACCESS_TOKEN_EXPIRE)))
+                .expiration(Date.from(Instant.now().plusSeconds(accessTokenExpiration)))
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -56,9 +58,9 @@ public class SecurityUtil {
     public String getRefreshToken(UUID userId) {
         return Jwts.builder()
                 .subject(REFRESH_TOKEN)
-                .claim("userId", userId.toString())
+                .claim(USER_ID, userId.toString())
                 .issuedAt(new Date())
-                .expiration(Date.from(Instant.now().plusSeconds(REFRESH_TOKEN_EXPIRE)))
+                .expiration(Date.from(Instant.now().plusSeconds(refreshTokenExpiration)))
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -82,7 +84,7 @@ public class SecurityUtil {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return UUID.fromString(claims.get("userId", String.class));
+        return UUID.fromString(claims.get(USER_ID, String.class));
     }
 
     public boolean isRefreshToken(String token){
