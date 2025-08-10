@@ -1,5 +1,6 @@
 package com.example.authserver.util;
 
+import com.example.authserver.exception.BadCredentialsException;
 import com.example.authserver.exception.ErrorResponse;
 import com.example.authserver.exception.InvalidSecurityParametersException;
 import com.example.authserver.exception.LoginAlreadyExistsException;
@@ -7,7 +8,6 @@ import com.example.authserver.exception.UserNotFoundException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
