@@ -37,7 +37,7 @@ public class SecurityUtil {
         try {
             privateKey = KeyFactory.getInstance("RSA").generatePrivate(
                     new PKCS8EncodedKeySpec(Base64.getDecoder().decode(prKey)));
-
+            
             publicKey = KeyFactory.getInstance("RSA").generatePublic(
                     new X509EncodedKeySpec(Base64.getDecoder().decode(pbKey)));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {

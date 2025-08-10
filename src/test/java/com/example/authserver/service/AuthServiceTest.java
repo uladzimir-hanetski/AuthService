@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +64,7 @@ class AuthServiceTest {
         when(passwordEncoder.encode(authRequest.getPassword())).thenReturn("password");
         when(authRepository.save(userCredentials)).thenReturn(userCredentials);
 
-        assertDoesNotThrow(() -> authService.register(authRequest));
+        assertDoesNotThrow(() -> authService.register(authRequest, UUID.randomUUID()));
         verify(authRepository).save(userCredentials);
     }
 
@@ -73,7 +72,8 @@ class AuthServiceTest {
     void testRegisterLoginAlreadyExists() {
         when(authRepository.existsByLogin(authRequest.getLogin())).thenReturn(true);
 
-        assertThrows(LoginAlreadyExistsException.class, () -> authService.register(authRequest));
+        assertThrows(LoginAlreadyExistsException.class, () -> authService.register(
+                authRequest, UUID.randomUUID()));
     }
 
     @Test
